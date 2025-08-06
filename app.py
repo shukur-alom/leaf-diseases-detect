@@ -24,12 +24,11 @@ from groq import Groq
 from dotenv import load_dotenv
 
 
-# Configure logging
+# Configure logging (console only, no file logging)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('disease_detection.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )
@@ -340,32 +339,6 @@ class LeafDiseaseDetector:
         output.append("=" * 60)
         return "\n".join(output)
 
-    def save_results(self, result: DiseaseAnalysisResult, output_file: str = None) -> str:
-        """
-        Save analysis results to JSON file
-
-        Args:
-            result (DiseaseAnalysisResult): Analysis results
-            output_file (str, optional): Output file path
-
-        Returns:
-            str: Path to saved file
-        """
-        if not output_file:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_file = f"disease_analysis_{timestamp}.json"
-
-        try:
-            with open(output_file, 'w', encoding='utf-8') as f:
-                json.dump(result.__dict__, f, indent=2, ensure_ascii=False)
-
-            logger.info(f"Results saved to: {output_file}")
-            return output_file
-
-        except Exception as e:
-            logger.error(f"Failed to save results: {str(e)}")
-            raise
-
 
 def main():
     """Main execution function"""
@@ -382,10 +355,6 @@ def main():
 
         # Display results
         print(detector.format_results(result))
-
-        # Save results to file
-        output_file = detector.save_results(result)
-        print(f"\nDetailed results saved to: {output_file}")
 
         # Also print JSON for programmatic use
         print("\nJSON Output:")
