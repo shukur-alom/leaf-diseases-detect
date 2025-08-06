@@ -4,10 +4,6 @@ Leaf Disease Detection System
 
 A professional leaf disease detection system using Groq's vision API
 to analyze plant leaf images and identify diseases with detailed analysis.
-
-Author: Your Name
-Version: 1.0.0
-Date: August 2025
 """
 
 import os
