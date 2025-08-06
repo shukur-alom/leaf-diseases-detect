@@ -15,7 +15,7 @@ def encode_image(image_path):
 
 
 # Load and encode the local image
-image_path = "Media/DanLeaf2.jpg"
+image_path = "Media/brown-spot-4 (1).jpg"
 base64_image = encode_image(image_path)
 
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
@@ -37,6 +37,13 @@ completion = client.chat.completions.create(
                     5. Symptoms observed
                     6. Possible causes
                     7. Treatment recommendations
+                    8. Bounding box locations of diseased areas (if any)
+                    
+                    For bounding boxes, provide coordinates as percentages of image dimensions (0-100):
+                    - x: left edge percentage
+                    - y: top edge percentage  
+                    - width: box width percentage
+                    - height: box height percentage
                     
                     Return only valid JSON in this format:
                     {
@@ -68,6 +75,11 @@ completion = client.chat.completions.create(
 
 # Get the response content
 response_content = completion.choices[0].message.content
+
+# Clean up the response - remove markdown code blocks if present
+if response_content.startswith('```json'):
+    response_content = response_content.replace(
+        '```json', '').replace('```', '').strip()
 
 try:
     # Try to parse as JSON
