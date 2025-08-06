@@ -1,7 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 app = FastAPI()
 
-@app.get('/disease-detection')
-async def disease_detection():  
-    return {"message": "Leaf Disease Detection API is running"}
+@app.post('/disease-detection')
+async def disease_detection(request: Request):
+    data = await request.json()
+    image_base64 = data.get("image")
+    # Next: decode and process image
+    return {"received": bool(image_base64)}
