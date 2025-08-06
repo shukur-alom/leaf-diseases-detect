@@ -104,7 +104,21 @@ class LeafDiseaseDetector:
         logger.info("Leaf Disease Detector initialized")
 
     def create_analysis_prompt(self) -> str:
-        """Create the analysis prompt for the AI model"""
+        """
+        Create the standardized analysis prompt for the AI model.
+        
+        Generates a comprehensive prompt that instructs the AI model to analyze
+        leaf images for diseases and return structured JSON results. The prompt
+        specifies the required output format and analysis criteria.
+        
+        Returns:
+            str: Formatted prompt string with instructions for disease analysis
+                 and JSON schema specification.
+                 
+        Note:
+            The prompt ensures consistent output formatting across all analyses
+            and includes all necessary fields for comprehensive disease assessment.
+        """
         return """Analyze this leaf image for diseases and return the results in JSON format. 
         
         Please identify:
