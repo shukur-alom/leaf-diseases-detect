@@ -350,18 +350,12 @@ def main():
         detector = LeafDiseaseDetector()
 
         # Analyze image
-        logger.info("Starting leaf disease detection analysis...")
         result = detector.analyze_leaf_image(IMAGE_PATH)
 
-        # Display results
-        print(detector.format_results(result))
-
-        # Also print JSON for programmatic use
-        print("\nJSON Output:")
+        # Print only JSON output
         print(json.dumps(result.__dict__, indent=2))
 
     except Exception as e:
-        logger.error(f"Application failed: {str(e)}")
         print(f"Error: {str(e)}")
         sys.exit(1)
 
