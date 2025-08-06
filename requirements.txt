@@ -1,2 +1,7 @@
+# Core dependencies
 groq==0.31.0
 python-dotenv==1.0.0
+
+# Additional professional dependencies
+pathlib2==2.3.7; python_version < "3.4"
+typing-extensions==4.8.0; python_version < "3.8"
