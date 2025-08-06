@@ -79,7 +79,23 @@ class LeafDiseaseDetector:
     DEFAULT_MAX_TOKENS = 1024
 
     def __init__(self, api_key: Optional[str] = None):
-        """Initialize the Leaf Disease Detector"""
+        """
+        Initialize the Leaf Disease Detector with API credentials.
+        
+        Sets up the Groq API client and validates the API key from either
+        the parameter or environment variables. Initializes logging for
+        tracking analysis operations.
+        
+        Args:
+            api_key (Optional[str]): Groq API key. If None, will attempt to
+                                   load from GROQ_API_KEY environment variable.
+        
+        Raises:
+            ValueError: If no valid API key is found in parameters or environment.
+            
+        Note:
+            Ensure your .env file contains GROQ_API_KEY or pass it directly.
+        """
         load_dotenv()
         self.api_key = api_key or os.environ.get("GROQ_API_KEY")
         if not self.api_key:
