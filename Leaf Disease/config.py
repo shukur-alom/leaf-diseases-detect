@@ -69,7 +69,34 @@ class AppConfig:
 
     @classmethod
     def from_env(cls) -> 'AppConfig':
-        """Create configuration from environment variables"""
+        """
+        Create configuration instance from environment variables.
+        
+        This class method provides a convenient way to initialize the configuration
+        by reading values from environment variables. It uses sensible defaults
+        for optional parameters while requiring critical settings like API keys.
+        
+        Environment Variables:
+            GROQ_API_KEY (required): API key for Groq AI services
+            MODEL_NAME (optional): Override default AI model name
+            MODEL_TEMPERATURE (optional): Override default model temperature
+            MAX_COMPLETION_TOKENS (optional): Override default max tokens
+            LOG_LEVEL (optional): Override default logging level
+            LOG_FILE (optional): Override default log file path
+        
+        Returns:
+            AppConfig: Configured instance with values from environment variables
+            
+        Raises:
+            ValueError: If GROQ_API_KEY environment variable is not set
+            
+        Example:
+            >>> import os
+            >>> os.environ['GROQ_API_KEY'] = 'your-api-key'
+            >>> os.environ['LOG_LEVEL'] = 'DEBUG'
+            >>> config = AppConfig.from_env()
+            >>> print(config.log_level)  # Output: DEBUG
+        """
         groq_api_key = os.getenv("GROQ_API_KEY")
         if not groq_api_key:
             raise ValueError("GROQ_API_KEY environment variable is required")
