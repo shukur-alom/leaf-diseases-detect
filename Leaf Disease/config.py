@@ -1,5 +1,17 @@
 """
-Configuration module for Leaf Disease Detection System
+Configuration module for Leaf Disease Detection System.
+
+This module provides centralized configuration management for the leaf disease
+detection application. It handles API keys, model parameters, logging settings,
+and other application-wide configurations through environment variables and
+default values.
+
+Classes:
+    AppConfig: Main configuration dataclass containing all application settings
+
+Usage:
+    >>> config = AppConfig.from_env()
+    >>> detector = LeafDiseaseDetector(api_key=config.groq_api_key)
 """
 
 import os
@@ -9,7 +21,38 @@ from typing import Optional
 
 @dataclass
 class AppConfig:
-    """Application configuration settings"""
+    """
+    Application configuration settings for the Leaf Disease Detection System.
+    
+    This dataclass encapsulates all configuration parameters required for the
+    application to function properly. It provides a centralized way to manage
+    API credentials, model settings, logging configuration, and file format
+    specifications.
+    
+    The configuration can be loaded from environment variables using the
+    from_env() class method, which provides a convenient way to deploy the
+    application with different settings across environments.
+    
+    Attributes:
+        groq_api_key (str): API key for Groq AI services (required)
+        model_name (str): Name of the AI model to use for analysis
+        model_temperature (float): Temperature parameter for model response generation
+        max_completion_tokens (int): Maximum tokens allowed in model responses
+        log_level (str): Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        log_file (str): Path to the log file for application logging
+        supported_formats (tuple): Tuple of supported image file extensions
+    
+    Example:
+        >>> # Create config from environment variables
+        >>> config = AppConfig.from_env()
+        >>> 
+        >>> # Create config with custom values
+        >>> config = AppConfig(
+        ...     groq_api_key="your-api-key",
+        ...     model_temperature=0.5,
+        ...     log_level="DEBUG"
+        ... )
+    """
 
     # API Configuration
     groq_api_key: str
