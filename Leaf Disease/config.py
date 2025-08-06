@@ -55,17 +55,17 @@ class AppConfig:
     """
 
     # API Configuration
-    groq_api_key: str
-    model_name: str = "meta-llama/llama-4-scout-17b-16e-instruct"
-    model_temperature: float = 0.3
-    max_completion_tokens: int = 1024
+    groq_api_key: str  # Required API key for Groq AI services
+    model_name: str = "meta-llama/llama-4-scout-17b-16e-instruct"  # AI model identifier
+    model_temperature: float = 0.3  # Controls randomness in model responses (0.0-2.0)
+    max_completion_tokens: int = 1024  # Maximum tokens in model responses
 
     # Logging Configuration
-    log_level: str = "INFO"
-    log_file: str = "disease_detection.log"
+    log_level: str = "INFO"  # Logging verbosity level
+    log_file: str = "disease_detection.log"  # Path to application log file
 
     # Analysis Configuration
-    supported_formats: tuple = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff')
+    supported_formats: tuple = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff')  # Supported image formats
 
     @classmethod
     def from_env(cls) -> 'AppConfig':
