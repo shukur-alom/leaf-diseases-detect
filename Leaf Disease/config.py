@@ -23,16 +23,16 @@ from typing import Optional
 class AppConfig:
     """
     Application configuration settings for the Leaf Disease Detection System.
-    
+
     This dataclass encapsulates all configuration parameters required for the
     application to function properly. It provides a centralized way to manage
     API credentials, model settings, logging configuration, and file format
     specifications.
-    
+
     The configuration can be loaded from environment variables using the
     from_env() class method, which provides a convenient way to deploy the
     application with different settings across environments.
-    
+
     Attributes:
         groq_api_key (str): API key for Groq AI services (required)
         model_name (str): Name of the AI model to use for analysis
@@ -41,7 +41,7 @@ class AppConfig:
         log_level (str): Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
         log_file (str): Path to the log file for application logging
         supported_formats (tuple): Tuple of supported image file extensions
-    
+
     Example:
         >>> # Create config from environment variables
         >>> config = AppConfig.from_env()
@@ -57,7 +57,8 @@ class AppConfig:
     # API Configuration
     groq_api_key: str  # Required API key for Groq AI services
     model_name: str = "meta-llama/llama-4-scout-17b-16e-instruct"  # AI model identifier
-    model_temperature: float = 0.3  # Controls randomness in model responses (0.0-2.0)
+    # Controls randomness in model responses (0.0-2.0)
+    model_temperature: float = 0.3
     max_completion_tokens: int = 1024  # Maximum tokens in model responses
 
     # Logging Configuration
@@ -65,17 +66,18 @@ class AppConfig:
     log_file: str = "disease_detection.log"  # Path to application log file
 
     # Analysis Configuration
-    supported_formats: tuple = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff')  # Supported image formats
+    # Supported image formats
+    supported_formats: tuple = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff')
 
     @classmethod
     def from_env(cls) -> 'AppConfig':
         """
         Create configuration instance from environment variables.
-        
+
         This class method provides a convenient way to initialize the configuration
         by reading values from environment variables. It uses sensible defaults
         for optional parameters while requiring critical settings like API keys.
-        
+
         Environment Variables:
             GROQ_API_KEY (required): API key for Groq AI services
             MODEL_NAME (optional): Override default AI model name
@@ -83,13 +85,13 @@ class AppConfig:
             MAX_COMPLETION_TOKENS (optional): Override default max tokens
             LOG_LEVEL (optional): Override default logging level
             LOG_FILE (optional): Override default log file path
-        
+
         Returns:
             AppConfig: Configured instance with values from environment variables
-            
+
         Raises:
             ValueError: If GROQ_API_KEY environment variable is not set
-            
+
         Example:
             >>> import os
             >>> os.environ['GROQ_API_KEY'] = 'your-api-key'
