@@ -46,7 +46,7 @@ class DiseaseAnalysisResult:
     symptoms: List[str]
     possible_causes: List[str]
     treatment: List[str]
-    analysis_timestamp: str = datetime.now().isoformat()
+    analysis_timestamp: str = datetime.now().astimezone().isoformat()
 
 
 class LeafDiseaseDetector:
