@@ -18,7 +18,18 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class DiseaseAnalysisResult:
-    """Data class for storing disease analysis results"""
+    """
+    Data class for storing comprehensive disease analysis results.
+    
+    This class encapsulates all the information returned from a leaf disease
+    analysis, including detection status, disease identification, severity
+    assessment, and treatment recommendations.
+    
+    Attributes:
+        disease_detected (bool): Whether a disease was detected in the leaf image
+        disease_name (Optional[str]): Name of the identified disease, None if healthy
+        disease_type (str): Category of disease (fungal, bacterial, viral, pest, etc.)
+    """
     disease_detected: bool
     disease_name: Optional[str]
     disease_type: str
@@ -31,7 +42,37 @@ class DiseaseAnalysisResult:
 
 
 class LeafDiseaseDetector:
-    """Minimal Leaf Disease Detection System"""
+    """
+    Advanced Leaf Disease Detection System using AI Vision Analysis.
+    
+    This class provides comprehensive leaf disease detection capabilities using
+    the Groq API with Llama Vision models. It can analyze leaf images to identify
+    diseases, assess severity, and provide treatment recommendations.
+    
+    The system supports base64 encoded images and returns structured JSON results
+    containing disease information, confidence scores, symptoms, causes, and
+    treatment suggestions.
+    
+    Features:
+        - Multi-disease detection (fungal, bacterial, viral, pest, nutrient deficiency)
+        - Severity assessment (mild, moderate, severe)
+        - Confidence scoring (0-100%)
+        - Symptom identification
+        - Treatment recommendations
+        - Robust error handling and response parsing
+    
+    Attributes:
+        MODEL_NAME (str): The AI model used for analysis
+        DEFAULT_TEMPERATURE (float): Default temperature for response generation
+        DEFAULT_MAX_TOKENS (int): Default maximum tokens for responses
+        api_key (str): Groq API key for authentication
+        client (Groq): Groq API client instance
+    
+    Example:
+        >>> detector = LeafDiseaseDetector()
+        >>> result = detector.analyze_leaf_image_base64(base64_image_data)
+        >>> print(f"Disease detected: {result['disease_detected']}")
+    """
 
     MODEL_NAME = "meta-llama/llama-4-scout-17b-16e-instruct"
     DEFAULT_TEMPERATURE = 0.3
