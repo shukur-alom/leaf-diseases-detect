@@ -87,7 +87,7 @@ with col1:
     uploaded_file = st.file_uploader(
         "Upload Leaf Image", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
-        st.image(uploaded_file, caption="Preview", use_column_width=True)
+        st.image(uploaded_file, caption="Preview")
 
 with col2:
     if uploaded_file is not None:
