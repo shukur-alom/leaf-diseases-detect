@@ -38,31 +38,7 @@ async def disease_detection_file(file: UploadFile = File(...)):
     except Exception as e:
         logger.error(f"Error in disease detection (file): {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
-@app.post('/disease-detection')
-async def disease_detection(request: Request):
-    """
-    Endpoint to detect diseases in leaf images using base64 encoded image data.
-    """
-    try:
-        data = await request.json()
-        image_base64 = data.get("image")
-        if not image_base64:
-            raise HTTPException(status_code=400, detail="No image data provided")
-        if not isinstance(image_base64, str):
-            raise HTTPException(status_code=400, detail="Image data must be a base64 string")
-        logger.info("Processing disease detection request (base64)")
-        result = test_with_base64_data(image_base64)
-        if result is None:
-            raise HTTPException(status_code=500, detail="Failed to process image")
-        logger.info("Disease detection completed successfully")
-        return JSONResponse(content=result)
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error in disease detection: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
+    
 
 @app.get("/")
 async def root():
@@ -71,7 +47,6 @@ async def root():
         "message": "Leaf Disease Detection API",
         "version": "1.0.0",
         "endpoints": {
-            "disease_detection": "/disease-detection (POST, base64)",
             "disease_detection_file": "/disease-detection-file (POST, file upload)"
         }
     }
