@@ -12,3 +12,8 @@ uvicorn>=0.21.1
 
 # Testing dependencies
 requests>=2.31.0
+
+python-multipart
+
+# Frontend dependencies
+streamlit
