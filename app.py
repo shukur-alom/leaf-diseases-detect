@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse
 import logging
-from utils import test_with_base64_data
+from utils import convert_image_to_base64_and_test, test_with_base64_data
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -10,51 +10,58 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="Leaf Disease Detection API", version="1.0.0")
 
 
+# New endpoint for direct image upload
+@app.post('/disease-detection-file')
+async def disease_detection_file(file: UploadFile = File(...)):
+    """
+    Endpoint to detect diseases in leaf images using direct image file upload.
+    Accepts multipart/form-data with an image file.
+    """
+    try:
+        logger.info("Received image file for disease detection")
+        # Save uploaded file to a temporary location
+        contents = await file.read()
+        temp_path = f"temp_{file.filename}"
+        with open(temp_path, "wb") as f:
+            f.write(contents)
+        # Use utils.py to convert and test
+        result = convert_image_to_base64_and_test(temp_path)
+        # Remove temp file
+        import os
+        os.remove(temp_path)
+        if result is None:
+            raise HTTPException(status_code=500, detail="Failed to process image file")
+        logger.info("Disease detection from file completed successfully")
+        return JSONResponse(content=result)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in disease detection (file): {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
 @app.post('/disease-detection')
 async def disease_detection(request: Request):
     """
     Endpoint to detect diseases in leaf images using base64 encoded image data.
-
-    Expected JSON payload:
-    {
-        "image": "base64_encoded_image_string"
-    }
-
-    Returns:
-    - Disease analysis results including detection status, disease name, severity, etc.
     """
     try:
-        # Parse request data
         data = await request.json()
         image_base64 = data.get("image")
-
-        # Validate input
         if not image_base64:
-            raise HTTPException(
-                status_code=400, detail="No image data provided")
-
+            raise HTTPException(status_code=400, detail="No image data provided")
         if not isinstance(image_base64, str):
-            raise HTTPException(
-                status_code=400, detail="Image data must be a base64 string")
-
-        logger.info("Processing disease detection request")
-
-        # Process image using utils.py function
+            raise HTTPException(status_code=400, detail="Image data must be a base64 string")
+        logger.info("Processing disease detection request (base64)")
         result = test_with_base64_data(image_base64)
-
         if result is None:
-            raise HTTPException(
-                status_code=500, detail="Failed to process image")
-
+            raise HTTPException(status_code=500, detail="Failed to process image")
         logger.info("Disease detection completed successfully")
         return JSONResponse(content=result)
-
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error in disease detection: {str(e)}")
-        raise HTTPException(
-            status_code=500, detail=f"Internal server error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
 @app.get("/")
@@ -64,6 +71,7 @@ async def root():
         "message": "Leaf Disease Detection API",
         "version": "1.0.0",
         "endpoints": {
-            "disease_detection": "/disease-detection (POST)"
+            "disease_detection": "/disease-detection (POST, base64)",
+            "disease_detection_file": "/disease-detection-file (POST, file upload)"
         }
     }
