@@ -1,75 +1,59 @@
-"""
-Base64 Image Test for Leaf Disease Detection
-===========================================
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File
+from fastapi.responses import JSONResponse
+import logging
+import os
+from utils import convert_image_to_base64_and_test, test_with_base64_data
 
-This script demonstrates how to send base64 image data directly to the detector.
-"""
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-import json
-import sys
-import base64
-from pathlib import Path
+app = FastAPI(title="Leaf Disease Detection API", version="1.0.0")
 
-# Add the Leaf Disease directory to Python path
-sys.path.insert(0, str(Path(__file__).parent / "Leaf Disease"))
-
-try:
-    from main import LeafDiseaseDetector
-except ImportError as e:
-    print(f'{{"error": "Could not import LeafDiseaseDetector: {str(e)}"}}')
-    sys.exit(1)
-
-
-def test_with_base64_data(base64_image_string: str):
+@app.post('/disease-detection-file')
+async def disease_detection_file(file: UploadFile = File(...)):
     """
-    Test disease detection with base64 image data
-
-    Args:
-        base64_image_string (str): Base64 encoded image data
+    Endpoint to detect diseases in leaf images using direct image file upload.
+    Accepts multipart/form-data with an image file.
     """
     try:
-        detector = LeafDiseaseDetector()
-        result = detector.analyze_leaf_image_base64(base64_image_string)
-        print(json.dumps(result, indent=2))
-        return result
+        logger.info("Received image file for disease detection")
+        
+        # Read uploaded file into memory
+        contents = await file.read()
+        
+        # Save to a writable /tmp directory (works on Vercel & locally)
+        temp_path = os.path.join("/tmp", f"temp_{file.filename}")
+        with open(temp_path, "wb") as f:
+            f.write(contents)
+        
+        # Process file
+        result = convert_image_to_base64_and_test(temp_path)
+        
+        # Clean up
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        
+        if result is None:
+            raise HTTPException(status_code=500, detail="Failed to process image file")
+        
+        logger.info("Disease detection from file completed successfully")
+        return JSONResponse(content=result)
+    
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f'{{"error": "{str(e)}"}}')
-        return None
+        logger.error(f"Error in disease detection (file): {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
-def convert_image_to_base64_and_test(image_path: str):
-    """
-    Convert an image file to base64 and test it
-
-    Args:
-        image_path (str): Path to the image file
-    """
-    try:
-        if not Path(image_path).exists():
-            print(f'{{"error": "Image file not found: {image_path}"}}')
-            return None
-
-        # Read and convert to base64
-        with open(image_path, "rb") as f:
-            image_bytes = f.read()
-
-        base64_string = base64.b64encode(image_bytes).decode('utf-8')
-
-        print(f"Converted image to base64 ({len(base64_string)} characters)")
-
-        # Test with the base64 data
-        return test_with_base64_data(base64_string)
-
-    except Exception as e:
-        print(f'{{"error": "{str(e)}"}}')
-        return None
-
-
-def main():
-    """Test with base64 conversion"""
-    image_path = "Media/brown-spot-4 (1).jpg"
-    convert_image_to_base64_and_test(image_path)
-
-
-if __name__ == "__main__":
-    main()
+@app.get("/")
+async def root():
+    """Root endpoint providing API information"""
+    return {
+        "message": "Leaf Disease Detection API",
+        "version": "1.0.0",
+        "endpoints": {
+            "disease_detection_file": "/disease-detection-file (POST, file upload)"
+        }
+    }
