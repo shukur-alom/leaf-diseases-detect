@@ -6,7 +6,7 @@ This script demonstrates how to send base64 image data directly to the detector.
 """
 
 import json
-import sys,
+import sys,os
 import base64
 from pathlib import Path
 
