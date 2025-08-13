@@ -3,6 +3,12 @@
 import streamlit as st
 import requests
 
+import streamlit as st
+import requests
+
+# Set Streamlit theme to light and wide mode
+st.set_page_config(page_title="Leaf Disease Detection", layout="wide")
+
 # Custom CSS for modern look
 st.markdown("""
     <style>
