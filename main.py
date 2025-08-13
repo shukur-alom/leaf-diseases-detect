@@ -100,7 +100,41 @@ with col2:
                         f"{api_url}/disease-detection-file", files=files)
                     if response.status_code == 200:
                         result = response.json()
-                        if result.get("disease_detected"):
+
+                        # Check if it's an invalid image
+                        if result.get("disease_type") == "invalid_image":
+                            st.markdown("<div class='result-card'>",
+                                        unsafe_allow_html=True)
+                            st.markdown(
+                                "<div class='disease-title'>⚠️ Invalid Image</div>", unsafe_allow_html=True)
+                            st.markdown(
+                                "<div style='color: #ff5722; font-size: 1.1em; margin-bottom: 1em;'>Please upload a clear image of a plant leaf for accurate disease detection.</div>", unsafe_allow_html=True)
+
+                            # Show the symptoms (which contain the error message)
+                            if result.get("symptoms"):
+                                st.markdown(
+                                    "<div class='section-title'>Issue</div>", unsafe_allow_html=True)
+                                st.markdown("<ul class='symptom-list'>",
+                                            unsafe_allow_html=True)
+                                for symptom in result.get("symptoms", []):
+                                    st.markdown(
+                                        f"<li>{symptom}</li>", unsafe_allow_html=True)
+                                st.markdown("</ul>", unsafe_allow_html=True)
+
+                            # Show treatment recommendations
+                            if result.get("treatment"):
+                                st.markdown(
+                                    "<div class='section-title'>What to do</div>", unsafe_allow_html=True)
+                                st.markdown("<ul class='treatment-list'>",
+                                            unsafe_allow_html=True)
+                                for treat in result.get("treatment", []):
+                                    st.markdown(
+                                        f"<li>{treat}</li>", unsafe_allow_html=True)
+                                st.markdown("</ul>", unsafe_allow_html=True)
+
+                            st.markdown("</div>", unsafe_allow_html=True)
+
+                        elif result.get("disease_detected"):
                             st.markdown("<div class='result-card'>",
                                         unsafe_allow_html=True)
                             st.markdown(
@@ -139,8 +173,20 @@ with col2:
                                 f"<div class='timestamp'>🕒 {result.get('analysis_timestamp', 'N/A')}</div>", unsafe_allow_html=True)
                             st.markdown("</div>", unsafe_allow_html=True)
                         else:
-                            st.info("No disease detected.")
-                            st.json(result)
+                            # Healthy leaf case
+                            st.markdown("<div class='result-card'>",
+                                        unsafe_allow_html=True)
+                            st.markdown(
+                                "<div class='disease-title'>✅ Healthy Leaf</div>", unsafe_allow_html=True)
+                            st.markdown(
+                                "<div style='color: #4caf50; font-size: 1.1em; margin-bottom: 1em;'>No disease detected in this leaf. The plant appears to be healthy!</div>", unsafe_allow_html=True)
+                            st.markdown(
+                                f"<span class='info-badge'>Status: {result.get('disease_type', 'healthy')}</span>", unsafe_allow_html=True)
+                            st.markdown(
+                                f"<span class='info-badge'>Confidence: {result.get('confidence', 'N/A')}%</span>", unsafe_allow_html=True)
+                            st.markdown(
+                                f"<div class='timestamp'>🕒 {result.get('analysis_timestamp', 'N/A')}</div>", unsafe_allow_html=True)
+                            st.markdown("</div>", unsafe_allow_html=True)
                     else:
                         st.error(f"API Error: {response.status_code}")
                         st.write(response.text)
