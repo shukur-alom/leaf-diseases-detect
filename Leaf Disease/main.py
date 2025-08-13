@@ -20,11 +20,11 @@ logger = logging.getLogger(__name__)
 class DiseaseAnalysisResult:
     """
     Data class for storing comprehensive disease analysis results.
-    
+
     This class encapsulates all the information returned from a leaf disease
     analysis, including detection status, disease identification, severity
     assessment, and treatment recommendations.
-    
+
     Attributes:
         disease_detected (bool): Whether a disease was detected in the leaf image
         disease_name (Optional[str]): Name of the identified disease, None if healthy
@@ -44,34 +44,43 @@ class DiseaseAnalysisResult:
 class LeafDiseaseDetector:
     """
     Advanced Leaf Disease Detection System using AI Vision Analysis.
-    
+
     This class provides comprehensive leaf disease detection capabilities using
     the Groq API with Llama Vision models. It can analyze leaf images to identify
-    diseases, assess severity, and provide treatment recommendations.
-    
+    diseases, assess severity, and provide treatment recommendations. The system
+    also validates that uploaded images contain actual plant leaves and rejects
+    images of humans, animals, or other non-plant objects.
+
     The system supports base64 encoded images and returns structured JSON results
     containing disease information, confidence scores, symptoms, causes, and
     treatment suggestions.
-    
+
     Features:
+        - Image validation (ensures uploaded images contain plant leaves)
         - Multi-disease detection (fungal, bacterial, viral, pest, nutrient deficiency)
         - Severity assessment (mild, moderate, severe)
         - Confidence scoring (0-100%)
         - Symptom identification
         - Treatment recommendations
         - Robust error handling and response parsing
-    
+        - Invalid image type detection and rejection
+
     Attributes:
         MODEL_NAME (str): The AI model used for analysis
         DEFAULT_TEMPERATURE (float): Default temperature for response generation
         DEFAULT_MAX_TOKENS (int): Default maximum tokens for responses
         api_key (str): Groq API key for authentication
         client (Groq): Groq API client instance
-    
+
     Example:
         >>> detector = LeafDiseaseDetector()
         >>> result = detector.analyze_leaf_image_base64(base64_image_data)
-        >>> print(f"Disease detected: {result['disease_detected']}")
+        >>> if result['disease_type'] == 'invalid_image':
+        ...     print("Please upload a plant leaf image")
+        >>> elif result['disease_detected']:
+        ...     print(f"Disease detected: {result['disease_name']}")
+        >>> else:
+        ...     print("Healthy leaf detected")
     """
 
     MODEL_NAME = "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -81,18 +90,18 @@ class LeafDiseaseDetector:
     def __init__(self, api_key: Optional[str] = None):
         """
         Initialize the Leaf Disease Detector with API credentials.
-        
+
         Sets up the Groq API client and validates the API key from either
         the parameter or environment variables. Initializes logging for
         tracking analysis operations.
-        
+
         Args:
             api_key (Optional[str]): Groq API key. If None, will attempt to
                                    load from GROQ_API_KEY environment variable.
-        
+
         Raises:
             ValueError: If no valid API key is found in parameters or environment.
-            
+
         Note:
             Ensure your .env file contains GROQ_API_KEY or pass it directly.
         """
@@ -106,31 +115,46 @@ class LeafDiseaseDetector:
     def create_analysis_prompt(self) -> str:
         """
         Create the standardized analysis prompt for the AI model.
-        
+
         Generates a comprehensive prompt that instructs the AI model to analyze
         leaf images for diseases and return structured JSON results. The prompt
         specifies the required output format and analysis criteria.
-        
+
         Returns:
             str: Formatted prompt string with instructions for disease analysis
                  and JSON schema specification.
-                 
+
         Note:
             The prompt ensures consistent output formatting across all analyses
             and includes all necessary fields for comprehensive disease assessment.
         """
-        return """Analyze this leaf image for diseases and return the results in JSON format. 
+        return """IMPORTANT: First determine if this image contains a plant leaf or vegetation. If the image shows humans, animals, objects, buildings, or anything other than plant leaves/vegetation, return the "invalid_image" response format below.
+
+        If this is a valid leaf/plant image, analyze it for diseases and return the results in JSON format.
         
         Please identify:
-        1. Disease name (if any)
-        2. Disease type/category
-        3. Severity level (mild, moderate, severe)
-        4. Confidence score (0-100%)
-        5. Symptoms observed
-        6. Possible causes
-        7. Treatment recommendations
+        1. Whether this is actually a leaf/plant image
+        2. Disease name (if any)
+        3. Disease type/category or invalid_image
+        4. Severity level (mild, moderate, severe)
+        5. Confidence score (0-100%)
+        6. Symptoms observed
+        7. Possible causes
+        8. Treatment recommendations
+
+        For NON-LEAF images (humans, animals, objects, or not detected as leaves, etc.), return this format:
+        {
+            "disease_detected": false,
+            "disease_name": null,
+            "disease_type": "invalid_image",
+            "severity": "none",
+            "confidence": 95,
+            "symptoms": ["This image does not contain a plant leaf"],
+            "possible_causes": ["Invalid image type uploaded"],
+            "treatment": ["Please upload an image of a plant leaf for disease analysis"]
+        }
         
-        Return only valid JSON in this exact format:
+        For VALID LEAF images, return this format:
         {
             "disease_detected": true/false,
             "disease_name": "name of disease or null",
@@ -146,7 +170,11 @@ class LeafDiseaseDetector:
                                   temperature: float = None,
                                   max_tokens: int = None) -> Dict:
         """
-        Analyze base64 encoded leaf image data for diseases and return JSON result
+        Analyze base64 encoded image data for leaf diseases and return JSON result.
+
+        First validates that the image contains a plant leaf. If the image shows
+        humans, animals, objects, or other non-plant content, returns an 
+        'invalid_image' response. For valid leaf images, performs disease analysis.
 
         Args:
             base64_image (str): Base64 encoded image data (without data:image prefix)
@@ -155,6 +183,8 @@ class LeafDiseaseDetector:
 
         Returns:
             Dict: Analysis results as dictionary (JSON serializable)
+                 - For invalid images: disease_type will be 'invalid_image'
+                 - For valid leaves: standard disease analysis results
 
         Raises:
             Exception: If analysis fails
