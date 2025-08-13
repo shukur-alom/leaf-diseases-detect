@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse
 import logging
+import os
 from utils import convert_image_to_base64_and_test, test_with_base64_data
 
 # Configure logging
@@ -27,7 +28,6 @@ async def disease_detection_file(file: UploadFile = File(...)):
         # Use utils.py to convert and test
         result = convert_image_to_base64_and_test(temp_path)
         # Remove temp file
-        import os
         os.remove(temp_path)
         if result is None:
             raise HTTPException(status_code=500, detail="Failed to process image file")
