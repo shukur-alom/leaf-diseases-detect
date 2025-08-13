@@ -55,7 +55,7 @@ if __name__ == "__main__":
     print("Leaf Disease Detection API Test")
     print("=" * 40)
 
-    api_url = "http://localhost:8000"
+    api_url = "http://leaf-diseases-detect.vercel.app"
 
     print("\n1. Testing root endpoint...")
     test_root_endpoint(api_url)
