@@ -64,3 +64,17 @@ def test_api_endpoint(api_url: str = "http://localhost:8000"):
     except Exception as e:
         print(f"Error: {str(e)}")
 
+
+def test_root_endpoint(api_url: str = "http://localhost:8000"):
+    """Test the root endpoint"""
+    try:
+        response = requests.get(f"{api_url}/")
+        if response.status_code == 200:
+            print("✓ Root endpoint working!")
+            print(json.dumps(response.json(), indent=2))
+        else:
+            print(f"✗ Root endpoint failed with status {response.status_code}")
+    except Exception as e:
+        print(f"Error testing root endpoint: {str(e)}")
+
+
