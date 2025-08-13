@@ -78,3 +78,14 @@ def test_root_endpoint(api_url: str = "http://localhost:8000"):
         print(f"Error testing root endpoint: {str(e)}")
 
 
+if __name__ == "__main__":
+    print("Leaf Disease Detection API Test")
+    print("=" * 40)
+
+    api_url = "http://localhost:8000"
+
+    print("\n1. Testing root endpoint...")
+    test_root_endpoint(api_url)
+
+    print("\n2. Testing disease detection endpoint...")
+    test_api_endpoint(api_url)
