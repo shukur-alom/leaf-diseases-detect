@@ -57,3 +57,13 @@ async def disease_detection(request: Request):
             status_code=500, detail=f"Internal server error: {str(e)}")
 
 
+@app.get("/")
+async def root():
+    """Root endpoint providing API information"""
+    return {
+        "message": "Leaf Disease Detection API",
+        "version": "1.0.0",
+        "endpoints": {
+            "disease_detection": "/disease-detection (POST)"
+        }
+    }
