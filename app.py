@@ -22,24 +22,15 @@ async def disease_detection_file(file: UploadFile = File(...)):
         # Read uploaded file into memory
         contents = await file.read()
         
-        # Save to a writable /tmp directory (works on Vercel & locally)
-        temp_path = os.path.join("/tmp", f"temp_{file.filename}")
-        with open(temp_path, "wb") as f:
-            f.write(contents)
+    # Process file directly from memory
+        result = convert_image_to_base64_and_test(contents)
         
-        # Process file
-        result = convert_image_to_base64_and_test(temp_path)
-        
-        # Clean up
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
+    # No cleanup needed since file is not saved locally
         
         if result is None:
             raise HTTPException(status_code=500, detail="Failed to process image file")
-        
         logger.info("Disease detection from file completed successfully")
         return JSONResponse(content=result)
-    
     except HTTPException:
         raise
     except Exception as e:

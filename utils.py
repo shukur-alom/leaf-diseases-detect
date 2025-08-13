@@ -37,31 +37,21 @@ def test_with_base64_data(base64_image_string: str):
         return None
 
 
-def convert_image_to_base64_and_test(image_path: str):
+def convert_image_to_base64_and_test(image_bytes: bytes):
     """
-    Convert an image file to base64 and test it
+    Convert image bytes to base64 and test it
 
     Args:
-        image_path (str): Path to the image file
+        image_bytes (bytes): Image data in bytes
     """
     try:
-        if not Path(image_path).exists():
-            print(f'{{"error": "Image file not found: {image_path}"}}')
+        if not image_bytes:
+            print('{"error": "No image bytes provided"}')
             return None
 
-        # Read and convert to base64
-        # Save to a writable /tmp directory (works on Vercel & locally)
-        temp_path = os.path.join("/tmp", f"temp_{file.filename}")
-        with open(temp_path, "wb") as f:
-            f.write(contents)
-
         base64_string = base64.b64encode(image_bytes).decode('utf-8')
-
         print(f"Converted image to base64 ({len(base64_string)} characters)")
-
-        # Test with the base64 data
         return test_with_base64_data(base64_string)
-
     except Exception as e:
         print(f'{{"error": "{str(e)}"}}')
         return None
