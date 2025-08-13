@@ -10,8 +10,6 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Leaf Disease Detection API", version="1.0.0")
 
-
-# New endpoint for direct image upload
 @app.post('/disease-detection-file')
 async def disease_detection_file(file: UploadFile = File(...)):
     """
@@ -20,25 +18,34 @@ async def disease_detection_file(file: UploadFile = File(...)):
     """
     try:
         logger.info("Received image file for disease detection")
-        # Save uploaded file to a temporary location
+        
+        # Read uploaded file into memory
         contents = await file.read()
-        temp_path = f"temp_{file.filename}"
+        
+        # Save to a writable /tmp directory (works on Vercel & locally)
+        temp_path = os.path.join("/tmp", f"temp_{file.filename}")
         with open(temp_path, "wb") as f:
             f.write(contents)
-        # Use utils.py to convert and test
+        
+        # Process file
         result = convert_image_to_base64_and_test(temp_path)
-        # Remove temp file
-        os.remove(temp_path)
+        
+        # Clean up
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        
         if result is None:
             raise HTTPException(status_code=500, detail="Failed to process image file")
+        
         logger.info("Disease detection from file completed successfully")
         return JSONResponse(content=result)
+    
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error in disease detection (file): {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-    
+
 
 @app.get("/")
 async def root():
