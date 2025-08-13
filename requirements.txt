@@ -17,6 +17,3 @@ python-multipart
 
 # Frontend dependencies
 streamlit
-=======
-streamlit
-requests
