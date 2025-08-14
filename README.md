@@ -17,7 +17,7 @@ An enterprise-grade AI-powered leaf disease detection system featuring a dual-in
 ## 🎯 Key Features
 
 ### 🎯 Core Capabilities
-- **🔍 Advanced Disease Detection**: Identifies 50+ plant diseases across multiple categories (fungal, bacterial, viral, pest-related, nutrient deficiencies)
+- **🔍 Advanced Disease Detection**: Identifies 500+ plant diseases across multiple categories (fungal, bacterial, viral, pest-related, nutrient deficiencies)
 - **📊 Precision Severity Assessment**: AI-powered classification of disease severity levels (mild, moderate, severe)
 - ** High-Confidence Scoring**: Provides confidence percentages (0-100%) with advanced uncertainty quantification
 - **💡 Expert Treatment Recommendations**: Evidence-based, actionable treatment protocols tailored to specific diseases
