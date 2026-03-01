@@ -10,6 +10,12 @@ typing-extensions>=4.8.0
 fastapi>=0.116.1
 uvicorn>=0.21.1
 
+# YOLO / Computer Vision dependencies
+ultralytics>=8.3.0
+opencv-python-headless>=4.8.0
+Pillow>=10.0.0
+numpy>=1.24.0
+
 # Testing dependencies
 requests>=2.31.0
 
